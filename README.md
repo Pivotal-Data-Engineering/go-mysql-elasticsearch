@@ -8,6 +8,7 @@ It uses `mysqldump` to fetch the origin data at first, then syncs data increment
 + `go get github.com/Pivotal-Data-Engineering/go-mysql-elasticsearch`, it will print some messages in console, skip it. :-)
 + cd `$GOPATH/src/github.com/Pivotal-Data-Engineering/go-mysql-elasticsearch`
 + `make`
++ [Documentation on using with MySQL tile in PCF](./MySQL_Tile_Service_Instance_Setup.md)
 
 ## How to use?
 
