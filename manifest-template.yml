@@ -10,4 +10,5 @@ applications:
       MY_PASS: <go-es-passwd>
       ES_ADDR: <your_elasticsearch_host:port>
       ES_HTTPS: true
+      GOPACKAGENAME: github.com/Pivotal-Data-Engineering/go-mysql-elasticsearch
 
