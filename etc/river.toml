@@ -1,8 +1,8 @@
 # MySQL address, user and password
 # user must have replication privilege in MySQL.
 my_addr = "127.0.0.1:3306"
-my_user = "root"
-my_pass = ""
+my_user = "go-es"
+my_pass = "go-es"
 my_charset = "utf8"
 
 # Set true when elasticsearch use https
@@ -19,6 +19,7 @@ es_pass = ""
 data_dir = "./var"
 
 # Inner Http status address
+# TODO: What is this used for?
 stat_addr = "127.0.0.1:12800"
 
 # pseudo server id like a slave 
@@ -29,7 +30,7 @@ flavor = "mysql"
 
 # mysqldump execution path
 # if not set or empty, ignore mysqldump.
-mysqldump = "mysqldump"
+mysqldump = ""
 
 # if we have no privilege to use mysqldump with --master-data,
 # we must skip it.
@@ -46,12 +47,9 @@ skip_no_pk_table = false
 
 # MySQL data source
 [[source]]
-schema = "test"
+schema = "service_instance_db"
+tables = ["reports"]
 
-# Only below tables will be synced into Elasticsearch.
-# "t_[0-9]{4}" is a wildcard table format, you can use it if you have many sub tables, like table_0000 - table_1023
-# I don't think it is necessary to sync all tables in a database.
-tables = ["t", "t_[0-9]{4}", "tfield", "tfilter"]
 
 # Below is for special rule mapping
 
@@ -67,82 +65,8 @@ tables = ["t", "t_[0-9]{4}", "tfield", "tfilter"]
 # 
 # The table `t` will be synced to ES index `test` and type `t`.
 [[rule]]
-schema = "test"
-table = "t"
-index = "test"
-type = "t"
+schema = "service_instance_db"
+table = "reports"
+index = "mvp"
+type = "reports"
 
-# Wildcard table rule, the wildcard table must be in source tables 
-# All tables which match the wildcard format will be synced to ES index `test` and type `t`.
-# In this example, all tables must have same schema with above table `t`;
-[[rule]]
-schema = "test"
-table = "t_[0-9]{4}"
-index = "test"
-type = "t"
-
-# Simple field rule 
-#
-# desc tfield;
-# +----------+--------------+------+-----+---------+-------+
-# | Field    | Type         | Null | Key | Default | Extra |
-# +----------+--------------+------+-----+---------+-------+
-# | id       | int(11)      | NO   | PRI | NULL    |       |
-# | tags     | varchar(256) | YES  |     | NULL    |       |
-# | keywords | varchar(256) | YES  |     | NULL    |       |
-# +----------+--------------+------+-----+---------+-------+
-#
-[[rule]]
-schema = "test"
-table = "tfield"
-index = "test"
-type = "tfield"
-
-[rule.field]
-# Map column `id` to ES field `es_id`
-id="es_id"
-# Map column `tags` to ES field `es_tags` with array type 
-tags="es_tags,list"
-# Map column `keywords` to ES with array type
-keywords=",list"
-
-# Filter rule 
-#
-# desc tfilter;
-# +-------+--------------+------+-----+---------+-------+
-# | Field | Type         | Null | Key | Default | Extra |
-# +-------+--------------+------+-----+---------+-------+
-# | id    | int(11)      | NO   | PRI | NULL    |       |
-# | c1    | int(11)      | YES  |     | 0       |       |
-# | c2    | int(11)      | YES  |     | 0       |       |
-# | name  | varchar(256) | YES  |     | NULL    |       |
-# +-------+--------------+------+-----+---------+-------+
-#
-[[rule]]
-schema = "test"
-table = "tfilter"
-index = "test"
-type = "tfilter"
-
-# Only sync following columns
-filter = ["id", "name"]
-
-# id rule
-#
-# desc tid_[0-9]{4};
-# +----------+--------------+------+-----+---------+-------+
-# | Field    | Type         | Null | Key | Default | Extra |
-# +----------+--------------+------+-----+---------+-------+
-# | id       | int(11)      | NO   | PRI | NULL    |       |
-# | tag      | varchar(256) | YES  |     | NULL    |       |
-# | desc     | varchar(256) | YES  |     | NULL    |       |
-# +----------+--------------+------+-----+---------+-------+
-#
-[[rule]]
-schema = "test"
-table = "tid_[0-9]{4}"
-index = "test"
-type = "t"
-# The es doc's id will be `id`:`tag`
-# It is useful for merge muliple table into one type while theses tables have same PK 
-id = ["id", "tag"]

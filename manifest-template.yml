@@ -1,0 +1,13 @@
+---
+applications:
+  - name: go-mysql-elasticsearch
+    command: go-mysql-elasticsearch
+    health-check-type: process
+    no-route: true
+    env:
+      MY_ADDR: <your_mysql_address>:<your_mysql_port>
+      MY_USER: <go-es-user>
+      MY_PASS: <go-es-passwd>
+      ES_ADDR: <your_elasticsearch_host:port>
+      ES_HTTPS: true
+

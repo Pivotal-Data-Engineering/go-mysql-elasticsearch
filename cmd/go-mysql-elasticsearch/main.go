@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strconv"
 	"syscall"
 
 	"github.com/juju/errors"
@@ -13,10 +14,13 @@ import (
 )
 
 var configFile = flag.String("config", "./etc/river.toml", "go-mysql-elasticsearch config file")
-var my_addr = flag.String("my_addr", "", "MySQL addr")
+
+var my_addr = flag.String("my_addr", "", `MySQL addr (e.g. "127.0.0.1:3306")`)
 var my_user = flag.String("my_user", "", "MySQL user")
 var my_pass = flag.String("my_pass", "", "MySQL password")
-var es_addr = flag.String("es_addr", "", "Elasticsearch addr")
+var es_addr = flag.String("es_addr", "", `Elasticsearch addr (e.g. "127.0.0.1:9200")`)
+var es_https = flag.Bool("es_https", false, "Whether Elasticsearch is using HTTPS")
+
 var data_dir = flag.String("data_dir", "", "path for go-mysql-elasticsearch to save data")
 var server_id = flag.Int("server_id", 0, "MySQL server id, as a pseudo slave")
 var flavor = flag.String("flavor", "", "flavor: mysql or mariadb")
@@ -42,6 +46,37 @@ func main() {
 	if err != nil {
 		println(errors.ErrorStack(err))
 		return
+	}
+
+	// Get several of these from the environment
+	var env_val = os.Getenv("MY_ADDR")
+	if len(env_val) > 0 {
+		*my_addr = env_val
+	}
+
+	env_val = os.Getenv("MY_USER")
+	if len(env_val) > 0 {
+		*my_user = env_val
+	}
+
+	env_val = os.Getenv("MY_PASS")
+	if len(env_val) > 0 {
+		*my_pass = env_val
+	}
+
+	env_val = os.Getenv("ES_ADDR")
+	if len(env_val) > 0 {
+		*es_addr = env_val
+	}
+
+	env_val = os.Getenv("ES_HTTPS")
+	if len(env_val) > 0 {
+		b, err := strconv.ParseBool(env_val)
+		if err != nil {
+			println(errors.ErrorStack(err))
+			return
+		}
+		*es_https = b
 	}
 
 	if len(*my_addr) > 0 {
