@@ -1,4 +1,4 @@
-go-mysql-elasticsearch is a service syncing your MySQL data into Elasticsearch automatically.
+<h1> VMware has ended active development of this project, this repository will no longer be updated.</h1><br>go-mysql-elasticsearch is a service syncing your MySQL data into Elasticsearch automatically.
 
 It uses `mysqldump` to fetch the origin data at first, then syncs data incrementally with binlog.
 
